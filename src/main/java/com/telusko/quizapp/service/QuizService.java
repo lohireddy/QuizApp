@@ -1,7 +1,7 @@
 package com.telusko.quizapp.service;
 
-import com.telusko.quizapp.dao.QuestionDao;
-import com.telusko.quizapp.dao.QuizDao;
+import com.telusko.quizapp.repo.QuestionRepo;
+import com.telusko.quizapp.repo.QuizRepo;
 import com.telusko.quizapp.model.Question;
 import com.telusko.quizapp.model.QuestionWrapper;
 import com.telusko.quizapp.model.Quiz;
@@ -19,26 +19,26 @@ import java.util.Optional;
 public class QuizService {
 
     @Autowired
-    QuizDao quizDao;
+    QuizRepo quizRepo;
     @Autowired
-    QuestionDao questionDao;
+    QuestionRepo questionRepo;
 
 
     public ResponseEntity<String> createQuiz(String category, int numQ, String title) {
 
-        List<Question> questions = questionDao.findRandomQuestionsByCategory(category, numQ);
+        List<Question> questions = questionRepo.findRandomQuestionsByCategory(category, numQ);
 
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setQuestions(questions);
-        quizDao.save(quiz);
+        quizRepo.save(quiz);
 
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
 
     }
 
     public ResponseEntity<List<QuestionWrapper>> getQuizQuestions(Integer id) {
-        Optional<Quiz> quiz = quizDao.findById(id);
+        Optional<Quiz> quiz = quizRepo.findById(id);
         List<Question> questionsFromDB = quiz.get().getQuestions();
         List<QuestionWrapper> questionsForUser = new ArrayList<>();
         for(Question q : questionsFromDB){
@@ -51,7 +51,7 @@ public class QuizService {
     }
 
     public ResponseEntity<Integer> calculateResult(Integer id, List<Response> responses) {
-        Quiz quiz = quizDao.findById(id).get();
+        Quiz quiz = quizRepo.findById(id).get();
         List<Question> questions = quiz.getQuestions();
         int right = 0;
         int i = 0;
